@@ -1,17 +1,54 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+import { AddThoughtForm } from "./AddThoughtForm";
+import { Thought } from "./Thought";
+import { generateId, getNewExpirationTime } from "./utilities";
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+function App() {
+  const [thoughts, setThoughts] = useState([
+    {
+      id: generateId(),
+      text: "This is a place for your passing thoughts.",
+      expiresAt: getNewExpirationTime(),
+    },
+    {
+      id: generateId(),
+      text: "They'll be removed after 15 seconds.",
+      expiresAt: getNewExpirationTime(),
+    },
+  ]);
+
+  const addThought = (thought) => {
+    setThoughts((prev) => [thought, ...prev]);
+  };
+
+  const removeThought = (thoughtIdToRemove) => {
+    setThoughts((prev) =>
+      prev.filter((thought) => thought.id !== thoughtIdToRemove)
+    );
+  };
+
+  return (
+    <div className="App">
+      <header>
+        <h1>Passing Thoughts</h1>
+      </header>
+      <main>
+        <AddThoughtForm addThought={addThought} />
+        <ul className="thoughts">
+          {thoughts.map((thought) => (
+            <Thought
+              key={thought.id}
+              thought={thought}
+              removeThought={removeThought}
+            />
+          ))}
+        </ul>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
